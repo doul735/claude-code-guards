@@ -1,0 +1,12 @@
+{
+  "name": "jeondaeli",
+  "description": "Claude Code 버릇 막기 훅·스킬·규칙 모음",
+  "owner": { "name": "플렛데이터" },
+  "plugins": [
+    {
+      "name": "code-guards",
+      "source": "./",
+      "description": "제안만 하고 끝내기, 계획 뒤집기, 서브에이전트 중첩을 막는 훅"
+    }
+  ]
+}
