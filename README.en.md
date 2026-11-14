@@ -4,7 +4,7 @@
 
 **The reply that ends with "Shall I proceed?", the plan that flipped after one question, the subagent that quietly spawns more subagents. Hooks and rules that stop Claude Code from doing these things.**
 
-Runs on plain Node.js. One repo, growing over time. This is the first batch.
+Hooks need only Node.js, the skill only Python 3. One repo, growing over time.
 
 ## Install
 
@@ -25,6 +25,7 @@ From a shell: `claude plugin marketplace add doul735/claude-code-guards`, then `
 | enforce-no-plan-flip | You asked one question and the agreed plan got swapped out | Blocks flipping a plan without an instruction to change it, and makes Claude explain its reasoning first | hook |
 | block-subagent-nesting | A subagent calls another subagent and the result vanishes | Blocks Agent calls made from inside a subagent | hook |
 | assumptions-and-corrections | You corrected Claude, it patched its earlier answer, and things got worse | Separates what you confirmed from what the AI assumed; after a correction, rebuilds from the confirmed list only | rule |
+| ask-top-models (`/code-guards:ask-top-models`) | You ask one AI about your own design and it just says "looks good" | Sends the same question separately to two different models (Claude + codex, gemini or a free OpenRouter model; two subagents if you have nothing else), collects counterarguments and sorts them into agreements and disagreements | skill |
 
 The research paper behind the rule is cited at the top of the rule file.
 
@@ -66,7 +67,6 @@ How to switch each hook off (environment variables) and its known limits are in 
 
 ## Still growing: what is coming
 
-- A skill that asks several models the same question and collects independent counterarguments
 - A skill that scrubs keys and personal data locally before anything is sent to an outside AI
 - A debate skill where you and the AI keep pushing back until one of you is convinced
 - A procedure for processing files with personal data without the AI ever seeing them
