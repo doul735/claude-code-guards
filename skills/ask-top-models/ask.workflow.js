@@ -40,7 +40,7 @@ const second = () => {
   }
   if (secondBackend === 'openrouter') {
     // 키는 환경변수에서만 읽는다. 모델 이름은 secondModel 또는 환경변수 OPENROUTER_MODEL.
-    return agent(relay(`cd ${shq(dir)} && python3 ${shq(skillDir + '/ask_openrouter.py')} second-prompt.md ${secondModel ? '--model ' + m : ''} > second-raw.md`),
+    return agent(relay(`cd ${shq(dir)} && python3 ${shq(skillDir + '/ask_openrouter.py')} second-prompt.md --attach ${shq(dir + '/brief.md')} ${secondModel ? '--model ' + m : ''} > second-raw.md`),
       { model: 'sonnet', effort: 'low', label: `openrouter:${secondModel || 'env'}`, phase: 'Ask' })
   }
   // subagent: 같은 Claude Code 안의 두 번째 서브에이전트. 첫째와 다른 관점을 주려고 반대 입장에서 읽게 한다.

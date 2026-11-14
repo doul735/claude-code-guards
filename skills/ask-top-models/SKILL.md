@@ -92,7 +92,9 @@ Workflow({ script: "<읽은 ask.workflow.js 내용 전체>",
 - **Claude**: Workflow 한 번에 `agent(prompt, {model: <agent_alias>, effort: <effort>})` — 브리프 경로를 주고 결과를 `<작업폴더>/claude-out.md`에 쓰게 한다.
 - **둘째 목소리**: 같은 Workflow 안의 중계 agent(작은 모델, 옮기기만)가 `secondBackend`에 맞는 명령을 Bash로 돌린다. codex면
   `codex exec -m <model> -c model_reasoning_effort="<effort>" -s read-only --skip-git-repo-check - < prompt.md > openai-out.md`
-  (timeout 580초, 실패 시 한 단계 낮은 강도로 1회 재시도 — 재시도했으면 보고에 적는다). openrouter면 `python3 ask_openrouter.py second-prompt.md --model <이름>`, gemini면 `gemini -m <이름> -p "$(cat second-prompt.md)"`. 중계자는 해석·가감 금지. 결과는 `<작업폴더>/second-out.md`.
+  (timeout 580초, 실패 시 한 단계 낮은 강도로 1회 재시도 — 재시도했으면 보고에 적는다). openrouter면 `python3 ask_openrouter.py second-prompt.md --model <이름> --attach <작업폴더>/brief.md`, gemini면 `gemini -m <이름> -p "$(cat second-prompt.md)"`. 중계자는 해석·가감 금지. 결과는 `<작업폴더>/second-out.md`.
+
+OpenRouter 모델은 내 컴퓨터 파일을 못 읽는다 — 브리프·기획 문서처럼 읽어야 할 파일은 `--attach`로 내용을 같이 보낸다(여러 개면 여러 번).
 
 **Workflow 도구가 없을 때**: 같은 일을 손으로 나눠 한다. ① 위 A~E 요구와 브리프 경로를 담은 글을 `<작업폴더>/second-prompt.md`로 저장 ② Bash로 둘째 목소리 명령(위 codex·openrouter·gemini 줄 중 하나)을 백그라운드로 돌려 `<작업폴더>/second-out.md`에 받기 ③ 그동안 Agent 도구로 Claude 서브에이전트 하나에 같은 글을 주고 `<작업폴더>/claude-out.md`에 쓰게 하기. 두 쪽이 서로의 답을 보기 전에 끝나야 한다 — 한쪽 답을 다른 쪽에 넘기지 않는다.
 
@@ -131,7 +133,7 @@ Workflow({ script: "<읽은 ask.workflow.js 내용 전체>",
 3. 동시에 둘:
    - Claude: `Agent({model: <claude.agent_alias>, effort: <claude.effort>, prompt: "<prompt.md 전문>\n\n답 JSON을 <작업 폴더>/claude-score.json 에만 쓰고(그 밖 파일 수정 금지) 같은 JSON을 반환하라."})`
    - 둘째(codex): `bash <이 스킬 폴더>/score/score_openai.sh <기획 문서> <작업 폴더> <openai.model> <openai.effort>` (백그라운드 가능, 결과 `openai-score.json`)
-   - 둘째(OpenRouter): `python3 <이 스킬 폴더>/ask_openrouter.py <작업 폴더>/prompt.md --model <모델 이름> --json > <작업 폴더>/openai-score.json` (결과 파일 이름은 같게 둔다)
+   - 둘째(OpenRouter): `python3 <이 스킬 폴더>/ask_openrouter.py <작업 폴더>/prompt.md --model <모델 이름> --attach <기획 문서 절대경로> --json > <작업 폴더>/openai-score.json` (결과 파일 이름은 같게 둔다)
 4. 합치기: `python3 <이 스킬 폴더>/score/merge_scores.py --a <작업 폴더>/claude-score.json --b <작업 폴더>/openai-score.json --a-name <claude.display> --b-name <둘째 모델 이름> --round <회차> --out <작업 폴더>/report.md`
    항목마다 낮은 점수, 0 대 2로 갈린 항목은 표시 — 기획 세션이 그 두 근거를 직접 대조한다. 종료 코드 0 합격 / 1 미달 / 2 입력 오류(채점 다시).
 5. **영수증**: report.md 첫 줄을 기획 문서 맨 위 상태 줄 바로 아래에 붙인다(회차마다 교체, 원문 report.md 경로 함께).

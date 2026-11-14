@@ -13,6 +13,14 @@ import argparse, json, os, sys, urllib.request, urllib.error
 
 URL = "https://openrouter.ai/api/v1/chat/completions"
 
+def build_content(prompt: str, attachments: list[tuple[str, str]]) -> str:
+    if not attachments:
+        return prompt
+    parts = [prompt, "", "아래는 위에서 말한 파일의 내용이다. 너는 로컬 파일을 열 수 없으니 이 내용만으로 판단하라."]
+    for path, content in attachments:
+        parts.extend([f"[첨부 파일: {path}]", content, "[첨부 끝]"])
+    return "\n".join(parts)
+
 def first_json_object(text):
     start = text.find("{")
     while start != -1:
@@ -40,6 +48,7 @@ def main():
     ap.add_argument("prompt_file")
     ap.add_argument("--model")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--attach", action="append")
     a = ap.parse_args()
     key = os.environ.get("OPENROUTER_API_KEY")
     model = a.model or os.environ.get("OPENROUTER_MODEL")
@@ -47,8 +56,16 @@ def main():
         print("OPENROUTER_API_KEY 환경변수가 없습니다", file=sys.stderr); return 2
     if not model:
         print("모델 이름이 없습니다 (--model 또는 OPENROUTER_MODEL)", file=sys.stderr); return 2
-    prompt = open(a.prompt_file, encoding="utf-8").read()
-    body = json.dumps({"model": model, "messages": [{"role": "user", "content": prompt}]}).encode()
+    with open(a.prompt_file, encoding="utf-8") as f:
+        prompt = f.read()
+    attachments = []
+    for path in a.attach or []:
+        try:
+            with open(path, encoding="utf-8") as f:
+                attachments.append((path, f.read()))
+        except (OSError, UnicodeError):
+            print(f"첨부 파일을 못 읽었습니다: {path}", file=sys.stderr); return 2
+    body = json.dumps({"model": model, "messages": [{"role": "user", "content": build_content(prompt, attachments)}]}).encode()
     req = urllib.request.Request(URL, data=body, headers={
         "Authorization": "Bearer " + key, "Content-Type": "application/json"})
     try:
@@ -67,4 +84,5 @@ def main():
     print(text)
     return 0
 
-sys.exit(main())
+if __name__ == "__main__":
+    sys.exit(main())
