@@ -1,11 +1,19 @@
 {
   "name": "code-guards",
   "displayName": "Code Guards",
-  "version": "0.1.0",
-  "description": "Claude Code의 버릇(제안만 하고 끝내기, 계획 뒤집기, 서브에이전트 중첩)을 막는 훅 모음",
-  "author": { "name": "플렛데이터" },
+  "version": "0.2.0",
+  "description": "Claude Code의 버릇(제안만 하고 끝내기, 계획 뒤집기, 서브에이전트 중첩)을 막는 훅과 두 모델 교차 의견 스킬",
+  "author": {
+    "name": "플렛데이터"
+  },
   "homepage": "https://github.com/doul735/claude-code-guards",
   "repository": "https://github.com/doul735/claude-code-guards",
   "license": "MIT",
-  "keywords": ["hooks", "guard", "stop-hook"]
+  "keywords": [
+    "hooks",
+    "guard",
+    "stop-hook",
+    "skills",
+    "second-opinion"
+  ]
 }
