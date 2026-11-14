@@ -128,7 +128,8 @@ OpenRouter 모델은 내 컴퓨터 파일을 못 읽는다 — 브리프·기획
 - **누가 채점하나**: 기획을 쓴 세션이 아니다 — 두 모델이 각자 문서를 직접 열어 채점하고, 기획 세션은 합치기 스크립트만 돌린다.
 
 절차(작업 폴더 `<기획 폴더>/score-r<회차>/`):
-1. `python3 <이 스킬 폴더>/resolve_top_models.py --tier mid` — exit 2면 멈추고 보고(다른 급으로 대체 금지). 강도는 `ASK_TOP_EFFORT`(기본 medium).
+1. 둘째 채점자가 codex일 때: `python3 <이 스킬 폴더>/resolve_top_models.py --tier mid` — exit 2면 멈추고 보고(다른 급으로 대체 금지). 강도는 `ASK_TOP_EFFORT`(기본 medium).
+   둘째가 OpenRouter면 1단계를 건너뛴다 — Claude 쪽은 세션 기본 모델(별칭 생략), 둘째는 OpenRouter 모델 이름을 직접 정한다(시작 구성 안내와 같다). 이때 4단계 `--a-name`·`--b-name`에는 쓴 모델 이름을 적는다.
 2. 지시문: `python3 <이 스킬 폴더>/score/build_prompt.py <기획 문서 절대경로> > <작업 폴더>/prompt.md`
 3. 동시에 둘:
    - Claude: `Agent({model: <claude.agent_alias>, effort: <claude.effort>, prompt: "<prompt.md 전문>\n\n답 JSON을 <작업 폴더>/claude-score.json 에만 쓰고(그 밖 파일 수정 금지) 같은 JSON을 반환하라."})`

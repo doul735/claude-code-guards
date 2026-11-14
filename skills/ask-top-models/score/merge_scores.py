@@ -75,6 +75,8 @@ def validate_scores(data, rubric, name, warnings):
         reason = None
         if item['score'] is None and not rule['na_ok']:
             reason = '해당 없음 불가 항목의 null'
+        elif item['score'] is None and not item['na_reason'].strip():
+            reason = '이유 없는 해당 없음'
         elif item['score'] in (1, 2) and not item['evidence'].strip():
             reason = '근거 없는 점수'
         if reason:

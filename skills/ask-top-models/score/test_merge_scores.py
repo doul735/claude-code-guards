@@ -66,6 +66,8 @@ class ScoreTests(unittest.TestCase):
         self.assertIn('크게 갈림', render_report(result, 'J1', 'J2'))
 
     def test_null_numeric(self):
+        for data in (self.a, self.b):
+            data['items'][7]['na_reason'] = '켜야 할 것이 없는 기획이다'
         for number in (0, 1, 2):
             for side in ('a', 'b'):
                 with self.subTest(number=number, side=side):
@@ -77,6 +79,8 @@ class ScoreTests(unittest.TestCase):
 
     def test_both_null_excluded(self):
         self.a['items'][7]['score'] = self.b['items'][7]['score'] = None
+        for data in (self.a, self.b):
+            data['items'][7]['na_reason'] = '켜야 할 것이 없는 기획이다'
         self.a['items'][4]['score'] = 0
         result = self.merge()
         self.assertEqual(result['total'], round(84 / 94 * 100, 1))
@@ -88,6 +92,28 @@ class ScoreTests(unittest.TestCase):
         result = self.merge()
         self.assertEqual(result['items'][0]['score'], 0)
         self.assertTrue(any('J1 A' in w and 'null' in w for w in result['warnings']))
+
+    def test_allowed_null_without_reason_zero_warning(self):
+        for reason in (None, '', ' \n '):
+            with self.subTest(reason=reason):
+                self.a['items'][7]['score'] = None
+                if reason is None:
+                    self.a['items'][7].pop('na_reason', None)
+                else:
+                    self.a['items'][7]['na_reason'] = reason
+                result = self.merge()
+                self.assertEqual(result['items'][7]['a']['score'], 0)
+                self.assertEqual(result['items'][7]['score'], 0)
+                self.assertEqual(result['warnings'], ['J1 H: 이유 없는 해당 없음 → 0점'])
+
+    def test_allowed_null_with_reason_excluded(self):
+        for data in (self.a, self.b):
+            data['items'][7].update(score=None, na_reason='켜야 할 것이 없는 기획이다')
+        result = self.merge()
+        self.assertIsNone(result['items'][7]['score'])
+        self.assertEqual(result['total'], 100)
+        self.assertNotIn('H', [item['id'] for item in result['gaps']])
+        self.assertEqual(result['warnings'], [])
 
     def test_no_evidence_zero_warning(self):
         for number in (1, 2):
@@ -141,6 +167,7 @@ class ScoreTests(unittest.TestCase):
         for data in (self.a, self.b):
             for item in data['items']:
                 item['score'] = None
+                item['na_reason'] = '해당 항목이 없는 기획이다'
         with self.assertRaisesRegex(ValueError, '0개'):
             self.merge()
 
