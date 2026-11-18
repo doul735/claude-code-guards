@@ -4,7 +4,7 @@
 
 **The reply that ends with "Shall I proceed?", the plan that flipped after one question, the subagent that quietly spawns more subagents. Hooks and rules that stop Claude Code from doing these things.**
 
-Hooks need only Node.js, the skill only Python 3. One repo, growing over time.
+Hooks need only Node.js, skills only Python 3. One repo, growing over time.
 
 ## Install
 
@@ -26,6 +26,7 @@ From a shell: `claude plugin marketplace add doul735/claude-code-guards`, then `
 | block-subagent-nesting | A subagent calls another subagent and the result vanishes | Blocks Agent calls made from inside a subagent | hook |
 | assumptions-and-corrections | You corrected Claude, it patched its earlier answer, and things got worse | Separates what you confirmed from what the AI assumed; after a correction, rebuilds from the confirmed list only | rule |
 | ask-top-models (`/code-guards:ask-top-models`) | You ask one AI about your own design and it just says "looks good" | Sends the same question separately to two different models (Claude + codex, gemini or a free OpenRouter model; two subagents if you have nothing else), collects counterarguments and sorts them into agreements and disagreements | skill |
+| privacy-gate (`/code-guards:privacy-gate`) | You nearly send a whole project to an outside AI with .env files or customer phone numbers included | Finds keys, phone numbers and emails locally before sending; decides whether to allow, redact or block, without displaying values | skill |
 
 The research paper behind the rule is cited at the top of the rule file.
 
@@ -67,7 +68,6 @@ How to switch each hook off (environment variables) and its known limits are in 
 
 ## Still growing: what is coming
 
-- A skill that scrubs keys and personal data locally before anything is sent to an outside AI
 - A debate skill where you and the AI keep pushing back until one of you is convinced
 - A procedure for processing files with personal data without the AI ever seeing them
 - A skill that batches review findings into one audit instead of one at a time

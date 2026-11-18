@@ -1,8 +1,8 @@
 {
   "name": "code-guards",
   "displayName": "Code Guards",
-  "version": "0.2.0",
-  "description": "Claude Code의 버릇(제안만 하고 끝내기, 계획 뒤집기, 서브에이전트 중첩)을 막는 훅과 두 모델 교차 의견 스킬",
+  "version": "0.3.0",
+  "description": "Claude Code 버릇을 막는 훅, 두 모델 교차 의견과 전송 전 키·개인정보 검사 스킬",
   "author": {
     "name": "플렛데이터"
   },
@@ -14,6 +14,8 @@
     "guard",
     "stop-hook",
     "skills",
-    "second-opinion"
+    "second-opinion",
+    "privacy",
+    "secret-scanning"
   ]
 }
