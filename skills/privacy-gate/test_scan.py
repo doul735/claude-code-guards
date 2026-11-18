@@ -44,6 +44,25 @@ class ScanTests(unittest.TestCase):
         self.assertEqual((process.returncode, report['verdict']), (1, 'REDACT'))
         self.assertEqual(report['findings'][0]['kind'], 'phone')
 
+    def test_assignment_does_not_cross_closing_quote(self):
+        for quote in ('"', "'"):
+            for value in ('', 'z' * 7):
+                with self.subTest(quote=quote, value_length=len(value)):
+                    line = 'to' + 'ken = ' + quote + value + quote + ', description = ' + quote + 'public text' + quote
+                    process, report = self.run_scan(self.write('config.txt', line))
+                    self.assertEqual((process.returncode, report['verdict']), (0, 'ALLOW'))
+                    self.assertEqual(report['findings'], [])
+
+    def test_assignment_eight_character_value_blocks(self):
+        for quote in ('"', "'"):
+            with self.subTest(quote=quote):
+                value = 'fake' + 'value'
+                line = 'To' + 'KeN = ' + quote + value + quote
+                process, report = self.run_scan(self.write('config.txt', line))
+                self.assertEqual((process.returncode, report['verdict']), (2, 'BLOCK'))
+                self.assertEqual(report['findings'][0]['kind'], 'assignment')
+                self.assertNotIn(value, process.stdout + process.stderr)
+
     def test_aws_block_and_no_values(self):
         value = 'AK' + 'IA' + 'Z' * 16
         process, report = self.run_scan(self.write('config.txt', '\n' + value))
