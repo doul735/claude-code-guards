@@ -23,7 +23,7 @@ PATTERNS = [
         r'''\b(?:api_key|secret|token|password)\b["']?\s*=\s*(?:"[^"\r\n]{8,}"|'[^'\r\n]{8,}')''',
         re.IGNORECASE)),
     ('phone', re.compile(r'(?<!\d)01[016789]-?\d{3,4}-?\d{4}(?!\d)')),
-    ('email', re.compile(r'\b[A-Za-z0-9.!#$%&\'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?\.[A-Za-z]{2,}\b')),
+    ('email', re.compile(r'(?<![A-Za-z0-9.!#$%&\'*+/=?^_`{|}~-])[A-Za-z0-9.!#$%&\'*+/=?^_`{|}~-]{1,64}@[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?\.[A-Za-z]{2,}\b')),
     ('resident_id', re.compile(r'(?<!\d)\d{6}-[1-4]\d{6}(?!\d)')),
 ]
 

@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from unittest import mock
 
@@ -43,6 +44,23 @@ class ScanTests(unittest.TestCase):
         process, report = self.run_scan(self.write('contact.txt', '010-' + '0000-0000'))
         self.assertEqual((process.returncode, report['verdict']), (1, 'REDACT'))
         self.assertEqual(report['findings'][0]['kind'], 'phone')
+
+    def test_email_long_base64_finishes_under_one_second(self):
+        spec = importlib.util.spec_from_file_location('privacy_scan', SCANNER)
+        scanner = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(scanner)
+        pattern = dict(scanner.PATTERNS)['email']
+        line = 'Ab0/' * 25000
+        started = time.perf_counter()
+        match = pattern.search(line)
+        elapsed = time.perf_counter() - started
+        self.assertIsNone(match)
+        self.assertLess(elapsed, 1.0)
+
+    def test_email_with_dot_and_plus(self):
+        process, report = self.run_scan(self.write('contact.txt', 'a.b+c@example.com'))
+        self.assertEqual((process.returncode, report['verdict']), (1, 'REDACT'))
+        self.assertIn('email', [item['kind'] for item in report['findings']])
 
     def test_assignment_does_not_cross_closing_quote(self):
         for quote in ('"', "'"):
